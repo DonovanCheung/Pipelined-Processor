@@ -1,0 +1,7 @@
+verilog work "ee457_scpu_cu.v"
+verilog work "ee457_regfile_2r1w.v"
+verilog work "ee457_alu.v"
+verilog work "ee457_scpu.v"
+verilog work "ee457_mem.v"
+verilog work "ee457_scpu_tb.v"
+verilog work "C:/Xilinx/14.7/ISE_DS/ISE//verilog/src/glbl.v"
