@@ -84,6 +84,81 @@ module ee457_scpu(
 	wire [31:0]		jump_target_pc;
 	wire [31:0]		branch_target_pc;
 	
+
+	// Decode Register 
+	reg [31:0]	pc_reg_id;
+//	reg [4:0]	shamt;
+	wire [5:0]		opcode;
+	wire [4:0]		rs;
+	wire [4:0]		rt;
+	wire [4:0]		rd;
+	wire [4:0]		shamt;	
+	wire [5:0]		func;
+	wire [15:0]		imm;
+	wire [25:0]		jmpaddr;
+	reg [31:0]		instruction;
+	reg [5:0]		opcode_reg;
+	reg [5:0]		func_reg;
+
+	
+	// Buffers
+	wire dmemread_buf;
+	wire dmemwrite_buf;
+	wire regwrite_buf;
+	wire memtoreg_buf;
+
+
+	// EX/ALU Register
+	reg [31:0]	pc_reg_ex;
+	reg [31:0]	rdata1_reg;
+	reg [31:0]	rdata2_reg;
+	reg [31:0]	imm_reg_ex;
+	reg [4:0]	rs_reg_ex;
+	reg [4:0]	rt_reg_ex;
+	reg [4:0]	rd_reg_ex;
+	
+	reg [9:0]	ex_reg_ex;
+	reg [3:0]	mem_reg_ex;
+	reg [1:0]	wb_reg_ex;
+
+
+	// ALU signals
+	wire 	[31:0]	alu_ina;
+	wire 	[31:0]	alu_inb;
+	reg	[5:0]		alu_func;
+	wire	[31:0]	alu_res;
+	wire 				sov;
+	wire    			uov;
+	wire				zero;
+	wire 	[31:0] 	alu_mux_in0;
+
+
+	//Forwarding Unit
+	reg EX1;
+	reg EX2;
+	reg [1:0] ALUSelA;
+	reg [1:0] ALUSelB;
+	
+
+	// MEM Register
+	reg	[31:0]	pc_reg_mem;
+	reg 				zero_reg;
+	reg 	[31:0]	alures_mem;
+	reg 	[31:0]	dmem_wdata_reg;
+	reg 	[4:0]		reg_wa_mem;
+	reg 	[3:0]		mem_reg_mem;
+	reg 	[1:0]		wb_reg_mem;
+	wire	[4:0]		reg_write_addr_wire;
+
+
+	// WB Register
+	reg [1:0]	wb_reg_wb;
+	reg [31:0]	alures_wb;
+	reg [31:0]  mem_rdata_wb;
+	reg [4:0]	reg_wa_wb;
+	reg [31:0]	reg_wdata_prev;
+	reg [4:0]	reg_wa_prev;
+
 	reg stall;
 	
 	initial
@@ -130,20 +205,7 @@ module ee457_scpu(
   assign next_pc = pc + 32'd4;
    
   
-  // Decode Register 
-	reg [31:0]	pc_reg_id;
-//	reg [4:0]	shamt;
-	wire [5:0]		opcode;
-	wire [4:0]		rs;
-	wire [4:0]		rt;
-	wire [4:0]		rd;
-	wire [4:0]		shamt;	
-	wire [5:0]		func;
-	wire [15:0]		imm;
-	wire [25:0]		jmpaddr;
-	reg [31:0]		instruction;
-	reg [5:0]		opcode_reg;
-	reg [5:0]		func_reg;
+  	// Decode
 	
 	always @(posedge clk)
 	begin
@@ -171,11 +233,7 @@ module ee457_scpu(
 
 	
 	
-	// Buffers
-	wire dmemread_buf;
-	wire dmemwrite_buf;
-	wire regwrite_buf;
-	wire memtoreg_buf;
+	
 
 	// Control Unit (state machine)
 	ee457_scpu_cu ctrl_unit(
@@ -207,21 +265,7 @@ module ee457_scpu(
 	);	
 	
 
-	// EX/ALU Register
-	reg [31:0]	pc_reg_ex;
-	reg [31:0]	rdata1_reg;
-	reg [31:0]	rdata2_reg;
-	reg [31:0]	imm_reg_ex;
-	reg [4:0]	rs_reg_ex;
-	reg [4:0]	rt_reg_ex;
-	reg [4:0]	rd_reg_ex;
-	
-	reg [9:0]	ex_reg_ex;
-	reg [3:0]	mem_reg_ex;
-	reg [1:0]	wb_reg_ex;
-	
-	
-
+	//Execute/ALU
 	always @(posedge clk)
 	begin
 		if (rst != 1)
@@ -260,27 +304,13 @@ module ee457_scpu(
 			end
 		end
 	end
-	
-		// ALU signals
-	wire 	[31:0]	alu_ina;
-	wire 	[31:0]	alu_inb;
-	reg	[5:0]		alu_func;
-	wire	[31:0]	alu_res;
-	wire 				sov;
-	wire    			uov;
-	wire				zero;
-	wire 	[31:0] 	alu_mux_in0; 
+	 
 
 	assign imm_sext_sh2 = {imm_reg_ex[29:0],2'b0};
 	assign branch_target_pc = pc_reg_ex + imm_sext_sh2;
  	assign jump_target_pc = {pc_reg_id[31:28],jmpaddr,2'b00};	// Check later
  	
-	//Forwarding Unit
-	reg EX1;
-	reg EX2;
-	reg [1:0] ALUSelA;
-	reg [1:0] ALUSelB;
-	
+	// Forwarding Unit
 	always @*
 	begin
 		EX1 = 0;
@@ -343,16 +373,8 @@ module ee457_scpu(
 		.cout()
 		);
 
-	// MEM Register
-	reg	[31:0]	pc_reg_mem;
-	reg 				zero_reg;
-	reg 	[31:0]	alures_mem;
-	reg 	[31:0]	dmem_wdata_reg;
-	reg 	[4:0]		reg_wa_mem;
-	reg 	[3:0]		mem_reg_mem;
-	reg 	[1:0]		wb_reg_mem;
-	wire	[4:0]		reg_write_addr_wire;
 	
+	// MEM
 	assign reg_write_addr_wire = ex_reg_ex[8] ? rd_reg_ex : rt_reg_ex;
 	// ex_reg_ex[8] = regdst in ID/EX
 	 
@@ -377,14 +399,8 @@ module ee457_scpu(
 	assign dmemread = mem_reg_mem[1];
 	assign dmemwrite = mem_reg_mem[0];
 	
-	// WB Register
-	reg [1:0]	wb_reg_wb;
-	reg [31:0]	alures_wb;
-	reg [31:0]  mem_rdata_wb;
-	reg [4:0]	reg_wa_wb;
-	reg [31:0]	reg_wdata_prev;
-	reg [4:0]	reg_wa_prev;
 	
+	// WB
 	always @(posedge clk)
 	begin
 		if (rst != 1)
