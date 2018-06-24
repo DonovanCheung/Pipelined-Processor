@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2018-06-23T13:14:48</DateModified>
+  <DateModified>2018-06-23T22:54:24</DateModified>
   <ModuleName>ee457_scpu</ModuleName>
   <SummaryTimeStamp>Unknown</SummaryTimeStamp>
   <SavedFilePath>C:/Users/Donovan/Documents/College/USC/EE 457/lab3/iseconfig/ee457_scpu.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>C:/Users/Donovan/Documents/College/USC/EE 457/lab3</ImplementationReportsDirectory>
+  <ImplementationReportsDirectory>C:/Users/Donovan/Documents/College/USC/EE 457/lab3\</ImplementationReportsDirectory>
   <DateInitialized>2018-06-23T13:14:48</DateInitialized>
   <EnableMessageFiltering>false</EnableMessageFiltering>
  </header>

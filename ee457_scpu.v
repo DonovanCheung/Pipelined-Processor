@@ -287,13 +287,13 @@ module ee457_scpu(
 				pc_reg_ex <= pc_reg_id;
 				
 				// Internal Forwarding 
-				if (rs == reg_wa_prev && reg_wa != 5'bXXXXX)
-					rdata1_reg <= reg_wdata_prev;
+				if (rs == reg_wa)
+					rdata1_reg <= reg_wdata;
 				else 
 					rdata1_reg <= reg_radata;
 		 
-				if (rt == reg_wa_prev && reg_wa != 5'bXXXXX)
-					rdata2_reg <= reg_wdata_prev;
+				if (rt == reg_wa)
+					rdata2_reg <= reg_wdata;
 				else
 					rdata2_reg <= reg_rbdata;
 					
@@ -322,31 +322,27 @@ module ee457_scpu(
 		if (wb_reg_mem[1] == 1 && reg_wa_mem != 0 && reg_wa_mem == rs_reg_ex)
 			// wb_reg_mem[1] = regwrite in EX/MEM, reg_wa_mem = writereg in EX/MEM, rs_reg_ex in reg1 in ID/EX
 			EX1 = 1;
-		else
-			EX1 = 0;
 		if (EX1 == 1)
 			ALUSelA = 2'b01; 
 			
 		if (wb_reg_mem[1] == 1 && reg_wa_mem != 0 && reg_wa_mem == rt_reg_ex)
 			// wb_reg_mem[1] = regwrite in EX/MEM, reg_wa_mem = writereg in EX/MEM, rt_reg_ex in reg2 in ID/EX
 			EX2 = 1;
-		else
-			EX2 = 0;
 		if (EX2 == 1)
 			ALUSelB = 2'b01;
 	
 		// MEM Hazard
-		if (wb_reg_mem[1] == 1 && reg_wa_mem != 0 && reg_wa_prev == rs && EX1 == 0)	// Check later
+		if (wb_reg_wb[1] == 1 && reg_wa_wb != 0 && reg_wa_wb == rs_reg_ex && EX1 == 0)	// Check later
 			// wb_reg_mem[1] = regwrite in EX/MEM
 			ALUSelA = 2'b10;
-		if (wb_reg_mem[1] == 1 && reg_wa_mem != 0 && reg_wa_prev == rt && EX2 == 0)
+		if (wb_reg_wb[1] == 1 && reg_wa_wb != 0 && reg_wa_wb == rt_reg_ex && EX2 == 0)
 			// wb_reg_mem[1] = regwrite in EX/MEM
 			ALUSelB = 2'b10;
 	end
 	
- 	assign alu_mux_in0 = (ALUSelB == 2'b10) ? reg_wdata_prev:
+ 	assign alu_mux_in0 = (ALUSelB == 2'b10) ? reg_wdata:
 						(ALUSelB == 2'b01) ? alures_mem:rdata2_reg;
- 	assign alu_ina = (ALUSelA == 2'b10) ? reg_wdata_prev: 	// Check later
+ 	assign alu_ina = (ALUSelA == 2'b10) ? reg_wdata: 	// Check later
 						(ALUSelA == 2'b01) ? alures_mem:rdata1_reg;
 	assign alu_inb = ex_reg_ex[9] ? imm_reg_ex:alu_mux_in0;
 	// ex_reg_ex[9] = alusrc

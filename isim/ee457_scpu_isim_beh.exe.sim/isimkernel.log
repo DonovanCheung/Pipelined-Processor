@@ -1,0 +1,29 @@
+Command line:
+   ee457_scpu_isim_beh.exe
+     -simmode  gui
+     -simrunnum  0
+     -socket  55581
+
+Sat Jun 23 22:57:40 2018
+
+
+ Elaboration Time: 0.109375 sec
+
+ Current Memory Usage: 5331.42 Meg
+
+ Total Signals          : 83
+ Total Nets             : 811
+ Total Signal Drivers   : 58
+ Total Blocks           : 5
+ Total Primitive Blocks : 4
+ Total Processes        : 73
+ Total Traceable Variables  : 122
+ Total Scalar Nets and Variables : 3007
+Total Line Count : 241
+
+ Total Simulation Time: 0.140625 sec
+
+ Current Memory Usage: 5331.42 Meg
+
+Sat Jun 23 22:57:47 2018
+
